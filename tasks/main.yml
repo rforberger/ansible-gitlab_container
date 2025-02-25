@@ -1,0 +1,36 @@
+---
+
+- name: Create data dir
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "/data/docker/gitlab_prod"
+    - "/data/docker/gitlab_prod/config"
+    - "/data/docker/gitlab_prod/logs"
+    - "/data/docker/gitlab_prod/data"
+
+
+- name: Start Gitlab container
+  community.docker.docker_container:
+    name: gitlab_prod
+    detach: yes
+    volumes: "/data/docker/gitlab_prod/config:/etc/gitlab,/data/docker/gitlab_prod/logs:/var/log/gitlab,/data/docker/gitlab_prod/data:/var/opt/gitlab"
+    restart_policy: unless-stopped
+    published_ports:
+      - "[::1]:8071:80"
+      - "[::1]:8072:443"
+      - "[::1]:8073:22"
+    env:
+      GITLAB_HOST: "https://gitlab.forberger-online.de"
+      EXTERNAL_URL: "https://gitlab.forberger-online.de"
+      GITLAB_CDN_HOST: "https://gitlab.forberger-online.de"
+    shm_size: "256m"
+    hostname: "gitlab.forberger-online.de"
+    image: "gitlab/gitlab-ce:latest"
+
+- name: Write start script
+  ansible.builtin.template:
+    dest: "/usr/sbin/start-gitlab.sh"
+    src: "start-gitlab.sh.j2"
+    mode: 0755

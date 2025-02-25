@@ -1,0 +1,14 @@
+---
+dependencies: [docker, gitlab-runner, nginx]
+
+galaxy_info:
+  role_name: gitlab
+  author: ronnyforberger
+  description: A role to deploy GitLab
+  company: ""
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.4
+  platforms:
+    - name: Debian
+      versions:
+        - all
